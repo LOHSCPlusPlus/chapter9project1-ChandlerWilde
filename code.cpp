@@ -1,13 +1,12 @@
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <istream>
 using namespace std;
 
 const int MAX_CARS = 999;
 
 struct cars{
-    char carName[100];
+    char carName[100] = {' '};
     double MPG;
     int cylinders;
     double displacememnt;
@@ -16,7 +15,19 @@ struct cars{
     double acceleration;
     int model;
     bool validEntry;
-    char origin[100];
+    char origin[100] = {' '};
+    cars();
+};
+
+cars::cars(){
+    MPG = 0;
+    cylinders = 0;
+    displacememnt = 0;
+    horsePower = 0;
+    weight = 0;
+    acceleration = 0;
+    model = 0;
+    validEntry = false;
 };
 
 void readCarData(ifstream &carFile, int start, int end, cars carz[MAX_CARS]);
@@ -25,10 +36,11 @@ void printOrigin(char origin[], int orSize, int start, int end, cars Cars[MAX_CA
 void removeCar(cars Cars[]);
 void addCar(cars Cars[]);
 int readInt(const char prompt[]);
+double readDouble(const char prompt[]);
 void displayMenu(cars Cars[]);
 
 int main(){
-    //makes all importantand variables used throughout the code
+    //makes all importand variables used throughout the code
     ifstream carFile("cars.txt");
     cars Cars[MAX_CARS];
     readCarData(carFile, 0, 100, Cars);
@@ -53,18 +65,15 @@ void addCar(cars Cars[]){
 
         cout << "Empty Slot found (" << firstInvalid << ")" << endl;
         cout << "Enter the cars name: ";
-        cin >> Cars[firstInvalid].carName;
-        cout << "Enter MPG: ";
-        cin >> Cars[firstInvalid].MPG;
+        cin.ignore(100, '\n');
+        cin.getline(Cars[firstInvalid].carName, 50);
+        //cin >> Cars[firstInvalid].carName;
+        Cars[firstInvalid].MPG = readDouble("Enter MPG:");
         Cars[firstInvalid].cylinders = readInt("Enter cylinders:");
-        cout << "Enter Displacement: ";
-        cin >> Cars[firstInvalid].displacememnt;
-        cout << "Enter HorsePower: ";
-        cin >> Cars[firstInvalid].horsePower;
-        cout << "Enter Weight: ";
-        cin >> Cars[firstInvalid].weight;
-        cout << "Enter Acceleration: ";
-        cin >> Cars[firstInvalid].acceleration;
+        Cars[firstInvalid].displacememnt = readDouble("Enter displacement: ");
+        Cars[firstInvalid].horsePower = readDouble("Enter HorsePower: ");
+        Cars[firstInvalid].weight = readDouble("Enter Weight:");
+        Cars[firstInvalid].acceleration = readDouble("Enter Acceleration: ");
         Cars[firstInvalid].model = readInt("Enter Model#: ");
         cout << "Enter Origin: ";
         cin >> Cars[firstInvalid].origin;
@@ -96,7 +105,6 @@ void printOrigin(char origin[], int orSize, int start, int end, cars Cars[999]){
 
     bool same = true;
     //variable to keep track of if it has the right origin
-
 
     //comparing your origin to the origin of the index car
     for(int index = start; index < end; index++){
@@ -200,6 +208,20 @@ int readInt(const char prompt[]){
     }
     return temp;
 }
+double readDouble(const char prompt[]){
+    double temp = 0;
+    cout << prompt;
+    cin >> temp;
+    while (!cin) {
+        cin.clear();
+        cin.ignore(1000,'\n');
+        cout << "Invalid Data!" << endl;
+        cout << prompt;
+        cin >> temp;
+    }
+    return temp;
+}
+
 
 void displayMenu(cars Cars[]){
 
@@ -208,7 +230,6 @@ void displayMenu(cars Cars[]){
     int high;
     int originLength;
     char origin[100];
-    bool quit = false;
 
     //while loop so you can do multiple functions
     while(1){
@@ -217,22 +238,19 @@ void displayMenu(cars Cars[]){
         cout << "Functions:" << endl;
         cout << "Display Car list (Enter 1)" << endl;
         cout << "Remove a Car from list (Enter 2)" << endl;
-        cout << "Add a Car to the list (Enter 3" << endl;
+        cout << "Add a Car to the list (Enter 3)" << endl;
         cout << "Display Cars by Origin (Enter 4)" << endl;
         cout << "Quit (Enter 5)" << endl << endl;
 
         while(option < 1 || option > 5){
-            cin >> option;
+            option = readInt("");
         }
 
         //all of the different functions with some text and cin cout if needed
         if(option == 1){
             cout << "Enter the range of cars to be displayed:" << endl;
-            cout << "Low: ";
-            cin >> low;
-            cout << "High: ";
-            cin >> high;
-
+            low = readInt("low: ");
+            high = readInt("high: ");
             printCars(Cars, low, high);
         }
         if(option == 2){
@@ -249,13 +267,10 @@ void displayMenu(cars Cars[]){
 
             cout << "Enter the Origin: ";
             cin >> origin;
-            cout << "Enter how many characters are in the origin: ";
-            cin >> originLength;
+            originLength = readInt("How many characters are in the origin: ");
             cout << "Enter the range of cars to be displayed: " << endl;
-            cout << "Low: ";
-            cin >> low;
-            cout << "High: ";
-            cin >> high;
+            low = readInt("low: ");
+            high = readInt("high: ");
             printOrigin(origin, originLength, low, high, Cars);
 
         }
